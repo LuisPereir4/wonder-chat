@@ -71,6 +71,7 @@ public class ConnectionManager : NetworkBehaviour
         catch (RelayServiceException e)
         {
             ListenToNetworkManagerEvents(false);
+            uiManager.OnRoomNotFound();
             Debug.Log($"[ConnectionManager] Fail while connecting {e}");
         }
     }

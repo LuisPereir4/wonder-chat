@@ -9,11 +9,13 @@ public class UIManager : MonoBehaviour
     [Header("Panels")]
     [SerializeField] GameObject mainPanel;
     [SerializeField] GameObject chatPanel;
+    [SerializeField] GameObject roomNotFoundPanel;
 
     [Header("Buttons")]
     [SerializeField] Button sendMessageButton;
     [SerializeField] Button joinChatButton;
     [SerializeField] Button leaveChatButton;
+    [SerializeField] Button gotItButton;
 
     [Header("Input fields")]
     [SerializeField] TMP_InputField nickNameInputField;
@@ -40,6 +42,7 @@ public class UIManager : MonoBehaviour
     {
         mainPanel.SetActive(false);
         chatPanel.SetActive(true);
+        roomNotFoundPanel.SetActive(false);
 
         SetupChattersList();
     }
@@ -48,6 +51,7 @@ public class UIManager : MonoBehaviour
     {
         mainPanel.SetActive(true);
         chatPanel.SetActive(false);
+        roomNotFoundPanel.SetActive(false);
     }
 
     public void InputFieldValidations()
@@ -92,6 +96,12 @@ public class UIManager : MonoBehaviour
             chatManager.SendMessageServerRpc(chatInputField.text, PlayerPrefs.GetString("Nickname"));
             chatInputField.text = string.Empty;
         });
+
+        gotItButton.onClick.AddListener(() =>
+        {
+            joinChatButton.interactable = true;
+            roomNotFoundPanel.gameObject.SetActive(false);
+        });
     }
 
     public void HandlePlayerPreferences()
@@ -134,6 +144,12 @@ public class UIManager : MonoBehaviour
                 break;
             }
         }
+    }
+
+    public void OnRoomNotFound()
+    {
+        joinChatButton.interactable = false;
+        roomNotFoundPanel.SetActive(true);
     }
 
 }
