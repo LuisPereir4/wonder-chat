@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Unity.Netcode;
-using static UnityEditor.FilePathAttribute;
-using UnityEngine.UIElements;
 
 [Serializable]
 public class Chatter
