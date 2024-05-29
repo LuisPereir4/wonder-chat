@@ -15,13 +15,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] Button joinChatButton;
     [SerializeField] Button leaveChatButton;
 
-    [Header("Buttons - Debug")]
-    [SerializeField] Button startServerButton;
-    [SerializeField] Button startHostButton;
-    [SerializeField] Button startClientButton;
-
     [Header("Input fields")]
     [SerializeField] TMP_InputField nickNameInputField;
+    [SerializeField] TMP_InputField roomIdInputField;
     [SerializeField] TMP_InputField chatInputField;
 
     [Header("Chatters")]
@@ -38,25 +34,17 @@ public class UIManager : MonoBehaviour
         SetupButtonsListeners();
     }
 
-    private void Update() => CheckKeyboard();
+    private void Update() => CheckKeyboardInput();
 
-    public void ConnectedIntoChat()
+    public void OnConnectedIntoServer()
     {
         mainPanel.SetActive(false);
         chatPanel.SetActive(true);
 
-        for (int i = 0; i < chatters.Count; i++)
-        {
-            if (chatters[i].gameObject.activeSelf == false)
-            {
-                chatters[i].gameObject.SetActive(true);
-                chatters[i].SetupChatterUI(PlayerPrefs.GetString("Nickname"), true);
-                break;
-            }
-        }
+        SetupChattersList();
     }
 
-    public void LeftChat()
+    public void OnLeftChat()
     {
         mainPanel.SetActive(true);
         chatPanel.SetActive(false);
@@ -66,26 +54,20 @@ public class UIManager : MonoBehaviour
     {
         nickNameInputField.onValueChanged.AddListener(l_nickNameText =>
         {
-            if (nickNameInputField.text.Length > 0)
-            {
-                joinChatButton.interactable = true;
-            }
-            else
-            {
-                joinChatButton.interactable = false;
-            }
+            if (nickNameInputField.text.Length > 0 && roomIdInputField.text.Length > 0) joinChatButton.interactable = true;
+            else joinChatButton.interactable = false;
+        });
+
+        roomIdInputField.onValueChanged.AddListener(l_nickNameText =>
+        {
+            if (nickNameInputField.text.Length > 0 && roomIdInputField.text.Length > 0) joinChatButton.interactable = true;
+            else joinChatButton.interactable = false;
         });
 
         chatInputField.onValueChanged.AddListener(l_chatText =>
         {
-            if (chatInputField.text.Length > 0)
-            {
-                sendMessageButton.interactable = true;
-            }
-            else
-            {
-                sendMessageButton.interactable = false;
-            }
+            if (chatInputField.text.Length > 0) sendMessageButton.interactable = true;
+            else sendMessageButton.interactable = false;
         });
     }
 
@@ -93,15 +75,16 @@ public class UIManager : MonoBehaviour
     {
         joinChatButton.onClick.AddListener(() =>
         {
+            joinChatButton.interactable = false;
             PlayerPrefs.SetString("Nickname", nickNameInputField.text);
-            connectionManager.ConnectClient();
-            ConnectedIntoChat();
+            connectionManager.JoinRoom(roomIdInputField.text);
         });
 
         leaveChatButton.onClick.AddListener(() =>
         {
-            connectionManager.DisconnectClient();
-            LeftChat();
+            joinChatButton.interactable = true;
+            connectionManager.Disconnect();
+            OnLeftChat();
         });
 
         sendMessageButton.onClick.AddListener(() =>
@@ -120,7 +103,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void CheckKeyboard()
+    private void CheckKeyboardInput()
     {
         if (Input.GetKeyDown(KeyCode.Return))
         {
@@ -131,6 +114,24 @@ public class UIManager : MonoBehaviour
             else if (chatPanel.activeSelf && chatInputField.text.Length > 0)
             {
                 sendMessageButton.onClick.Invoke();
+            }
+        }
+    }
+
+    private void SetupChattersList()
+    {
+        for (int i = 0; i < chatters.Count; i++)
+        {
+            if (chatters[i].gameObject.activeSelf) chatters[i].gameObject.SetActive(false);
+        }
+
+        for (int i = 0; i < chatters.Count; i++)
+        {
+            if (!chatters[i].gameObject.activeSelf)
+            {
+                chatters[i].gameObject.SetActive(true);
+                chatters[i].SetupChatterUI(PlayerPrefs.GetString("Nickname"), true);
+                break;
             }
         }
     }

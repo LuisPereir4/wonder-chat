@@ -4,13 +4,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Unity.Netcode;
-using UnityEditor.VersionControl;
+using static UnityEditor.FilePathAttribute;
+using UnityEngine.UIElements;
 
 [Serializable]
 public class Chatter
 {
     public string nickname;
     public ulong networkId;
+
+    public Chatter(string nickname, ulong networkId)
+    {
+        this.nickname = nickname;
+        this.networkId = networkId;
+    }
 }
 
 [Serializable]
@@ -35,7 +42,7 @@ public class ChatManager : NetworkBehaviour
     [ClientRpc]
     public void SendMessageToAllChattersClientRpc(string p_message, string p_nickname)
     {
-        chatText.text += $"\n[{p_nickname}] {p_message}";
+        chatText.text += $"\n<b><color=#1D5EAF>[{p_nickname}]</b></color> {p_message}";
         Debug.Log("Message received: " + p_message);
     }
 
